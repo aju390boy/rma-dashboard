@@ -1,0 +1,78 @@
+services:
+
+  # ── MongoDB Replica Set ─────────────────────────────────────────
+  mongo:
+    image: mongo:8.0
+    container_name: rma-mongo
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - rma-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── MongoDB RS Init (runs once, exits) ─────────────────────────
+  mongo-init:
+    image: mongo:8.0
+    container_name: rma-mongo-init
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - rma-network
+    restart: "no"
+    command: >
+      mongosh --host mongo:27017 --quiet --eval
+      "try { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] }) }
+       catch(e) { print('Already initialized: ' + e.message) }"
+
+  # ── Express API Server ─────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: rma-server
+    env_file: ./server/.env.docker
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/rma_dashboard?replicaSet=rs0
+      CLIENT_URL: http://localhost
+    ports:
+      - "5000:5000"
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+    networks:
+      - rma-network
+    restart: unless-stopped
+
+  # ── React Client (nginx) ───────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000
+    container_name: rma-client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    networks:
+      - rma-network
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+
+networks:
+  rma-network:
+    driver: bridge
