@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -10,18 +11,20 @@ import Orders from './pages/Orders';
 import RMAQueue from './pages/RMAQueue';
 import Analytics from './pages/Analytics';
 
-const AppLayout = ({ children }) => (
-  <div className="app-layout">
-    <Sidebar />
-    <div className="main-content">
-      <Header />
-      <main className="page-content">{children}</main>
-    </div>
-  </div>
-);
+const AppLayout = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-// SocketProvider sits inside QueryClientProvider (from main.jsx) so it can
-// call useQueryClient to invalidate caches on real-time events.
+  return (
+    <div className="app-layout">
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="main-content">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
+        <main className="page-content">{children}</main>
+      </div>
+    </div>
+  );
+};
+
 const AuthenticatedApp = ({ children }) => (
   <SocketProvider>{children}</SocketProvider>
 );

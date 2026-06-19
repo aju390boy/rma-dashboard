@@ -1144,13 +1144,276 @@ input, select, textarea { font-family: inherit; }
 .tab:hover { color: var(--text-primary); }
 .tab.active { color: var(--text-accent); border-bottom-color: var(--accent-primary); }
 
-/* ─── Responsive ─────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE — Full mobile-first system
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Hamburger Button (hidden on desktop) ───────────────────── */
+.hamburger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+.hamburger-btn span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+/* ─── Sidebar close button (hidden on desktop) ───────────────── */
+.sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-left: auto;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s;
+}
+.sidebar-close-btn:hover { color: var(--text-primary); }
+
+/* ─── Sidebar Overlay ────────────────────────────────────────── */
+.sidebar-overlay {
+  display: none;
+}
+
+/* ─── Connection label (hide text on very small screens) ─────── */
+.connection-label { display: inline; }
+
+/* ─── Header date (hide on small screens) ────────────────────── */
+.header-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ══════════════════════════════════════
+   TABLET  (≤ 1024px)
+══════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════
+   MOBILE  (≤ 768px)
+══════════════════════════════════════ */
 @media (max-width: 768px) {
+
+  /* Layout */
   :root { --sidebar-width: 0px; }
-  .sidebar { display: none; }
-  .main-content { margin-left: 0; }
-  .detail-grid { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: 1fr 1fr; }
+
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  /* ─ Hamburger visible ─ */
+  .hamburger-btn {
+    display: flex;
+  }
+
+  /* ─ Sidebar: hidden off-screen, slides in ─ */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s var(--ease-out);
+    z-index: 1000;
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 40px rgba(0,0,0,0.5);
+  }
+
+  /* ─ Sidebar close button visible on mobile ─ */
+  .sidebar-close-btn {
+    display: block;
+  }
+
+  /* ─ Overlay behind sidebar ─ */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+    animation: fadeIn 0.2s ease;
+  }
+
+  /* ─ Header ─ */
+  .header {
+    left: 0 !important;
+    padding: 0 var(--space-4);
+    gap: var(--space-3);
+  }
+  .header-left {
+    gap: var(--space-3);
+  }
+  .header-title {
+    font-size: 16px !important;
+  }
+  .header-subtitle {
+    display: none;
+  }
+  .header-badge--responsive {
+    display: none;
+  }
+  .header-date {
+    display: none;
+  }
+  .connection-label {
+    display: none;
+  }
+
+  /* ─ Page content ─ */
+  .page-content {
+    padding: var(--space-4) !important;
+  }
+
+  /* ─ Stats cards: 2 columns on mobile ─ */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+  .stat-card {
+    padding: var(--space-4);
+  }
+  .stat-value {
+    font-size: 24px !important;
+  }
+
+  /* ─ Table: horizontal scroll ─ */
+  .table-wrapper,
+  .orders-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-lg);
+  }
+  .data-table,
+  .orders-table {
+    min-width: 640px;
+  }
+
+  /* ─ Filter bar: stack vertically ─ */
+  .filter-bar {
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: stretch;
+  }
+  .filter-bar > * {
+    width: 100%;
+  }
+  .filter-search,
+  .filter-select,
+  .filter-input {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  /* ─ Detail grid: single column ─ */
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  /* ─ Analytics: single column ─ */
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  .chart-card {
+    padding: var(--space-4);
+  }
+
+  /* ─ RMA Panel: full width ─ */
+  .rma-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* ─ Cards ─ */
+  .card {
+    padding: var(--space-4);
+  }
+
+  /* ─ Modal / OrderDetail: full screen ─ */
+  .order-detail-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .order-detail-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    overflow-y: auto;
+  }
+
+  /* ─ Buttons ─ */
+  .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  /* ─ Login page ─ */
+  .login-card {
+    padding: var(--space-6) var(--space-5);
+    margin: var(--space-4);
+  }
+}
+
+/* ══════════════════════════════════════
+   SMALL MOBILE  (≤ 480px)
+══════════════════════════════════════ */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-value {
+    font-size: 20px !important;
+  }
+  .header-title {
+    font-size: 14px !important;
+  }
+  .page-content {
+    padding: var(--space-3) !important;
+  }
+  .data-table th,
+  .data-table td {
+    padding: var(--space-3) var(--space-3) !important;
+    font-size: 12px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ════════════════════════════════════════════════════════════════

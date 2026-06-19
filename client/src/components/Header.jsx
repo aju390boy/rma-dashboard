@@ -10,7 +10,7 @@ const PAGE_META = {
   '/analytics': { title: 'Analytics',  subtitle: 'Trends, charts & insights' },
 };
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const { pathname } = useLocation();
   const meta = PAGE_META[pathname] || { title: 'RMA Dashboard', subtitle: '' };
   const { data } = usePendingRMAs();
@@ -22,6 +22,15 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-left">
+        {/* Hamburger — only visible on mobile */}
+        <button
+          className="hamburger-btn"
+          onClick={onMenuClick}
+          aria-label="Open menu"
+        >
+          <span /><span /><span />
+        </button>
+
         <div>
           <div className="header-title">{meta.title}</div>
           {meta.subtitle && <div className="header-subtitle">{meta.subtitle}</div>}
@@ -29,9 +38,9 @@ const Header = () => {
       </div>
 
       <div className="header-right">
-        {/* Live pending badge */}
+        {/* Live pending badge — hidden on small phones */}
         {pendingCount > 0 && (
-          <div className="header-badge">
+          <div className="header-badge header-badge--responsive">
             <span className="status-dot" />
             {pendingCount} pending {pendingCount === 1 ? 'return' : 'returns'}
           </div>
@@ -40,11 +49,11 @@ const Header = () => {
         {/* Socket connection indicator */}
         <div className="connection-indicator" title={isConnected ? 'Real-time connected' : 'Connecting…'}>
           <span className={`connection-dot ${isConnected ? 'connected' : ''}`} />
-          <span>{isConnected ? 'Live' : '…'}</span>
+          <span className="connection-label">{isConnected ? 'Live' : '…'}</span>
         </div>
 
-        {/* Date */}
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+        {/* Date — hidden on small phones */}
+        <div className="header-date">
           {new Date().toLocaleDateString('en-IN', { dateStyle: 'medium' })}
         </div>
 
